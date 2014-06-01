@@ -15,6 +15,7 @@ SET(VERSION 2.0.0)
 # Find Macros
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
+INCLUDE(CMakeDependentOption)
 INCLUDE(CheckCCompilerFlag)
 INCLUDE(CheckCSourceCompiles)
 INCLUDE(CheckIncludeFile)
@@ -33,6 +34,7 @@ MESSAGE(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 # Set our optoins
 OPTION(WANT_PLAYER      "Build WildMIDI player in addition to the libraries" ON)
 OPTION(WANT_STATIC      "Build static library in addition to dynamic library" OFF)
+CMAKE_DEPENDENT_OPTION(WANT_PLAYERSTATIC "Build a statically linked WildMIDI player" ON "WANT_STATIC" OFF)
 OPTION(WANT_ALSA        "Include ALSA (Advanced Linux Sound Architecture) support" OFF)
 OPTION(WANT_OSS         "Include OSS (Open Sound System) support" OFF)
 #OPTION(WANT_COREAUDIO   "Include CoreAudio support (Driver support for Mac OS X" OFF)
@@ -65,6 +67,7 @@ ENDIF()
 IF(CMAKE_COMPILER_IS_GNUCC OR "${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
     ADD_DEFINITIONS(
         -Wall -W
+        -fno-common
         )
 
     IF(NOT WIN32 AND NOT CYGWIN)
@@ -122,11 +125,12 @@ SET(AUDIODRV_OPENAL)
 IF(UNIX AND NOT APPLE)
 
     # Go looking for available sound packages for WildMIDI player
-    IF(WANT_PLAYER) # Set our preferred output
+    IF(WANT_PLAYER OR WANT_PLAYERSTATIC)
         FIND_PACKAGE(ALSA)
         FIND_PACKAGE(OpenAL)
         FIND_PACKAGE(OSS)
 
+        # Set preferred output
         IF(WANT_ALSA)
             IF(NOT ALSA_FOUND)
                 MESSAGE(FATAL_ERROR "ALSA required but not found.")
@@ -170,7 +174,7 @@ IF(UNIX AND NOT APPLE)
             ENDIF()
 
         ENDIF()
-    ENDIF(WANT_PLAYER)
+    ENDIF()
 
     # find our math lib
     FIND_LIBRARY(M_LIBRARY m REQUIRED)
@@ -183,7 +187,7 @@ IF(UNIX AND NOT APPLE)
     ENDIF (DPKG_PROGRAM)
 ENDIF(UNIX AND NOT APPLE)
 
-IF (APPLE AND WANT_PLAYER)
+IF (APPLE AND (WANT_PLAYER OR WANT_PLAYERSTATIC))
     FIND_PACKAGE(OpenAL)
 
     IF(WANT_OPENAL)
@@ -203,12 +207,12 @@ IF (APPLE AND WANT_PLAYER)
         ENDIF()
 
     ENDIF()
-ENDIF(APPLE AND WANT_PLAYER)
+ENDIF()
 
 IF(WIN32)
-    IF (WANT_PLAYER)
+    IF (WANT_PLAYER OR WANT_PLAYERSTATIC)
         LINK_LIBRARIES(winmm)
-    ENDIF(WANT_PLAYER)
+    ENDIF()
 ENDIF(WIN32)
 
 # ######### General setup ##########
