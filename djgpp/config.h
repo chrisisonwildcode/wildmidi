@@ -3,7 +3,7 @@
 #define PACKAGE_URL "http://www.mindwerks.net/projects/wildmidi/"
 #define PACKAGE_BUGREPORT "https://github.com/Mindwerks/wildmidi/issues"
 
-#define PACKAGE_VERSION "0.4.0"
+#define PACKAGE_VERSION "0.4.4"
 
 #define HAVE_C_INLINE
 
@@ -14,3 +14,4 @@
 #define __builtin_expect(x,c) x
 #endif
 
+#define WM_NO_LOCK 1 /* don't need locking in MSDOS */

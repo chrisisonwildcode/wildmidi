@@ -5,24 +5,27 @@
  * use forward- and back-slash in path names interchangeably, and
  * some of them have case-insensitive file names.
  *
- * Copyright 2000, 2001, 2007 Free Software Foundation, Inc.
+ * This was based on filenames.h from BFD, the Binary File Descriptor
+ * library, Copyright (C) 2000-2016 Free Software Foundation, Inc.,
+ * and changed by O. Sezer <sezero@users.sourceforge.net> for our needs.
+ * The original version of this header in binutils/gcc is GPL licensed,
+ * this modified version was authorized to be LGPL in our LGPL projects:
+ * http://gcc.gnu.org/ml/gcc-patches/2016-09/msg02007.html
+ * http://gcc.gnu.org/ml/gcc-patches/2016-09/msg02179.html
  *
- * This is based on filenames.h from BFD, the Binary File Descriptor
- * library, changed further for our needs.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+ * General Public License for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 #ifndef FILENAMES_H
@@ -31,31 +34,31 @@
 #include <string.h>
 
 /* ---------------------- Windows, DOS, OS2: ---------------------- */
-#if defined(__MSDOS__) || defined(MSDOS) || defined(__DOS__)	|| \
-    defined(__DJGPP__) || defined(__OS2__) || defined(__EMX__)	|| \
+#if defined(__MSDOS__) || defined(MSDOS) || defined(__DOS__)    || \
+    defined(__DJGPP__) || defined(__OS2__) || defined(__EMX__)  || \
     defined(_WIN32) || defined(__CYGWIN__)
 
 #define HAVE_DOS_BASED_FILE_SYSTEM 1
 #define HAVE_CASE_INSENSITIVE_FILE_SYSTEM 1
 
-#define HAS_DRIVE_SPEC(f)	((f)[0] && ((f)[1] == ':'))
-#define STRIP_DRIVE_SPEC(f)	((f) + 2)
-#define IS_DIR_SEPARATOR(c)	((c) == '/' || (c) == '\\')
+#define HAS_DRIVE_SPEC(f)       ((f)[0] && ((f)[1] == ':'))
+#define STRIP_DRIVE_SPEC(f)     ((f) + 2)
+#define IS_DIR_SEPARATOR(c)     ((c) == '/' || (c) == '\\')
 /* both '/' and '\\' work as dir separator.  djgpp likes changing
  * '\\' into '/', so I define DIR_SEPARATOR_CHAR as '/' for djgpp,
  * '\\' otherwise.  */
 #ifdef __DJGPP__
-#define DIR_SEPARATOR_CHAR	'/'
-#define DIR_SEPARATOR_STR	"/"
+#define DIR_SEPARATOR_CHAR      '/'
+#define DIR_SEPARATOR_STR       "/"
 #else
-#define DIR_SEPARATOR_CHAR	'\\'
-#define DIR_SEPARATOR_STR	"\\"
+#define DIR_SEPARATOR_CHAR      '\\'
+#define DIR_SEPARATOR_STR       "\\"
 #endif
 /* Note that IS_ABSOLUTE_PATH accepts d:foo as well, although it is
    only semi-absolute.  This is because the users of IS_ABSOLUTE_PATH
    want to know whether to prepend the current working directory to
    a file name, which should not be done with a name like d:foo.  */
-#define IS_ABSOLUTE_PATH(f)	(IS_DIR_SEPARATOR((f)[0]) || HAS_DRIVE_SPEC((f)))
+#define IS_ABSOLUTE_PATH(f)     (IS_DIR_SEPARATOR((f)[0]) || HAS_DRIVE_SPEC((f)))
 
 #ifdef __cplusplus
 static inline char *FIND_FIRST_DIRSEP(char *_the_path) {
@@ -110,16 +113,16 @@ static inline char *FIND_LAST_DIRSEP (const char *_the_path) {
 #endif /* C++ */
 
 /* ----------------- AmigaOS, MorphOS, AROS, etc: ----------------- */
-#elif defined(__MORPHOS__) || defined(__AROS__)			|| \
-      defined(__amigaos__) || defined(__amigaos4__)		|| \
-      defined(__amigados__) || defined(__AMIGA) || defined(__AMIGA__)
+#elif defined(__MORPHOS__) || defined(__AROS__) || defined(AMIGAOS)          || \
+      defined(__amigaos__) || defined(__amigaos4__) || defined(__amigados__) || \
+      defined(AMIGA) || defined(_AMIGA) || defined(__AMIGA__)
 
-#define HAS_DRIVE_SPEC(f)	(0) /* */
-#define STRIP_DRIVE_SPEC(f)	(f) /* */
-#define IS_DIR_SEPARATOR(c)	((c) == '/' || (c) == ':')
-#define DIR_SEPARATOR_CHAR	'/'
-#define DIR_SEPARATOR_STR	"/"
-#define IS_ABSOLUTE_PATH(f)	(IS_DIR_SEPARATOR((f)[0]) || (strchr((f), ':')))
+#define HAS_DRIVE_SPEC(f)       (0) /* */
+#define STRIP_DRIVE_SPEC(f)     (f) /* */
+#define IS_DIR_SEPARATOR(c)     ((c) == '/' || (c) == ':')
+#define DIR_SEPARATOR_CHAR      '/'
+#define DIR_SEPARATOR_STR       "/"
+#define IS_ABSOLUTE_PATH(f)     (IS_DIR_SEPARATOR((f)[0]) || (strchr((f), ':')))
 #define HAVE_CASE_INSENSITIVE_FILE_SYSTEM 1
 
 #ifdef __cplusplus
@@ -159,12 +162,12 @@ static inline char *FIND_LAST_DIRSEP (const char *_the_path) {
 /* ---------------------- assumed UNIX-ish : ---------------------- */
 #else /* */
 
-#define IS_DIR_SEPARATOR(c)	((c) == '/')
-#define DIR_SEPARATOR_CHAR	'/'
-#define DIR_SEPARATOR_STR	"/"
-#define IS_ABSOLUTE_PATH(f)	(IS_DIR_SEPARATOR((f)[0]))
-#define HAS_DRIVE_SPEC(f)	(0)
-#define STRIP_DRIVE_SPEC(f)	(f)
+#define IS_DIR_SEPARATOR(c)     ((c) == '/')
+#define DIR_SEPARATOR_CHAR      '/'
+#define DIR_SEPARATOR_STR       "/"
+#define IS_ABSOLUTE_PATH(f)     (IS_DIR_SEPARATOR((f)[0]))
+#define HAS_DRIVE_SPEC(f)       (0)
+#define STRIP_DRIVE_SPEC(f)     (f)
 
 #ifdef __cplusplus
 static inline char *FIND_FIRST_DIRSEP(char *_the_path) {
@@ -191,3 +194,4 @@ static inline char *FIND_LAST_DIRSEP (const char *_the_path) {
 #endif
 
 #endif /* FILENAMES_H */
+

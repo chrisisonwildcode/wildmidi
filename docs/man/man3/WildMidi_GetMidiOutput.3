@@ -1,32 +1,25 @@
-.TH WildMidi_Live 3 "7 March 2014" "" "WildMidi Programmer's Manual"
+.TH WildMidi_GetMidiOutput 3 "10 March 2016" "" "WildMidi Programmer's Manual"
 .SH NAME
-WildMidi_Live \- Push a midi event into the head of the processing buffer.
+WildMidi_GetMidiOutput \- get a midi file of a file being processed.
 .SH LIBRARY
 .B libWildMidi
 .PP
 .SH SYNOPSIS
 .B #include <wildmidi_lib.h>
 .PP
-.B int WildMidi_Live (midi *\fIhandle\fP, uint32_t \fImidi_event\fP)
+.B int WildMidi_GetMidiOutput (midi *\fIhandle\fP, int8_t **\fIbuffer\fP, uint32_t *\fIsize\fP)
 .PP
 .SH DESCRIPTION
-.B UNDERDEVEL AND MAY CHANGE BEFORE RELEASE
-.PP
-Places \fImidi_event\fP at the head of the processing buffer so it is the next event processed.
+Writes the midi\-format data from the file being processed to the memory location pointed to by \fIbuffer\fP. The data will be in type-0 format for type-0 and type-1 files.  For type-2 files, the data will be in type-2 format unless the WM_MO_SAVEASTYPE0 option is set.
 .PP
 .IP \fIhandle\fP
-The identifier obtained from opening a midi file with \fBWildMidi_Open\fR(3)\fP or \fBWildMidi_OpenBuffer\fR(3)\fP
+The identifier obtained from opening a file with \fBWildMidi_Open\fR(3)\fP or \fBWildMidi_OpenBuffer\fR(3)\fP
 .PP
-.IP \fImidi_event\fP
-The midi data that WildMIDI is to process. bits 31\-24 contain the event and channel info with bits 23\-0 containing the data shifted left.
+.IP \fIbuffer\fP
+The memory location where libWildMidi is to store the midi data from the \fIhandle\fP. The \fIbuffer\fP will be allocated with \fBmalloc\fP() and must be \fBfree\fP()d by the caller when it is no longer needed.
 .PP
-.nf
-Example: Note on event
-    event_byte = 0x91;
-    note_byte = 0x7f;
-    velocity_byte = 0x65;
-    midi_event = (event_byte << 24) | (note_byte << 16) | (velocity_byte << 8);
-.fi
+.IP \fIsize\fP
+The location where libWildMidi is to store the size of the midi data stored in \fIbuffer\fP.
 .PP
 .SH "RETURN VALUE"
 Returns \-1 on error otherwise returns 0
@@ -46,12 +39,11 @@ Returns \-1 on error otherwise returns 0
 .BR wildmidi.cfg (5)
 .PP
 .SH AUTHOR
-Chris Ison <wildcode@users.sf.net>
+Chris Ison <chrisisonwildcode@gmail.com>
 Bret Curtis <psi29a@gmail.com>
 .PP
 .SH COPYRIGHT
-Copyright (C) Chris Ison  2001\-2011
-Copyright (C) Bret Curtis 2013\-2014
+Copyright (C) WildMidi Developers 2001\-2016
 .PP
 This file is part of WildMIDI.
 .PP
